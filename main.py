@@ -27,8 +27,10 @@ def get_text_messages(message):
                     # при reward = 0 значит не удалось поставить награду
                     if reward != 0:
                         kpi = dbfunc.select_top_kpi(reply_to_message_user_id)
+                        # сюда добавить вызов level_up_down(tg_user_id) чтобы получить уровень или потерять его
+                        level = dbfunc.level_up_down(reply_to_message_user_id)
                         ans = "Репутация увеличена на 1 " + str(
-                            message.reply_to_message.from_user.username) + " " + "(" + str(kpi) + ")"
+                            message.reply_to_message.from_user.username) + " " + "(" + str(kpi) + ")" + level
                         bot.send_message(message.chat.id, ans)
                     else:
                         ans = "Не получилось, упс. " + str(message.reply_to_message.from_user.username)
