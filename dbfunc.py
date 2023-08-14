@@ -150,23 +150,27 @@ def update_level(tg_user_id, level): #обновим значение уровн
             sqlite_connection.close()
             # Соединение с SQLite закрыто
 def level_up_down(tg_user_id): #проверим текущий уровень в бд и вычислим уровень после добавления репутации
-    level_now = select_user_level_from_users(tg_user_id)
-    level_new = select_top_kpi(tg_user_id) // 10 + 1
+    level_now = select_user_level_from_users(tg_user_id) #получим из бд текущий лвл пользователя
+    level_new = select_top_kpi(tg_user_id) // 10 + 1 #посчитаем все награды и за каждые 10, 1 уровень
     #добавим скилл на каждом 10 уровне
-    if level_new % 10 == 0:
+    if level_new % 10 == 0 and level_new > level_now:
         user_id = select_userid_from_users(tg_user_id)
         skill_new = skill_add(user_id)
-    if level_new > level_now:
+        update_level(tg_user_id, level_new)
         ans = ' Поздравляю, вы получили новый уровень, ваш уровень = ' + str(level_new) + ' ' + skill_new
-        update_level(tg_user_id, level_new)
-        return ans
-    elif level_new < level_now:
-        ans = ' Вы потеряли один уровень, ваш уровень = ' + str(level_new)
-        update_level(tg_user_id, level_new)
         return ans
     else:
-        ans = ' Ваш уровень = ' + str(level_new)
-        return ans
+        if level_new > level_now:
+            ans = ' Поздравляю, вы получили новый уровень, ваш уровень = ' + str(level_new)
+            update_level(tg_user_id, level_new)
+            return ans
+        elif level_new < level_now:
+            ans = ' Вы потеряли один уровень, ваш уровень = ' + str(level_new)
+            update_level(tg_user_id, level_new)
+            return ans
+        else:
+            ans = ' Ваш уровень = ' + str(level_new)
+            return ans
 
 def select_user_skills(user_id): #вернет все id скиллов пользователя
     try:
